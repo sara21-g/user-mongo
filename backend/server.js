@@ -1,7 +1,9 @@
 require('dotenv').config();
 const dns = require('dns');
-// Force public DNS resolvers to fix SRV lookup issues with MongoDB Atlas
-dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+// Force public DNS resolvers ONLY locally to fix SRV lookup issues with MongoDB Atlas on Windows.
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+}
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -15,32 +17,42 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Vercel Serverless MongoDB Connection Logic
+let isConnected = false;
+
+const connectDB = async () => {
+  if (isConnected) return;
+  try {
+    const db = await mongoose.connect(process.env.MONGODB_URI);
+    isConnected = db.connections[0].readyState === 1;
+    console.log('✅ Connected to MongoDB Atlas');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+  }
+};
+
+// Middleware to ensure DB connection before handling API routes
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
 // Routes
 app.use('/api/users', userRoutes);
 
 // Health check route
-app.get('/', (req, res) => {
-  res.json({
-    message: '🚀 User Management System API is running',
-    version: '1.0.0',
-    endpoints: {
-      users: '/api/users',
-    },
-  });
+app.get('/api/health', (req, res) => {
+  res.json({ message: '🚀 User Management API is running' });
 });
 
-// Connect to MongoDB then start server
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('✅ Connected to MongoDB successfully');
+// Ensure the server actually listens on ports for standard VPS/Local
+if (!process.env.VERCEL) {
+  connectDB().then(() => {
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on http://localhost:${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.error('❌ MongoDB connection error:', err.message);
-    process.exit(1);
   });
+}
 
+// Export the app for Vercel Serverless
 module.exports = app;
