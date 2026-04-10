@@ -1,0 +1,138 @@
+{
+  "info": {
+    "name": "UserHub — User Management API",
+    "_postman_id": "ums-api-collection",
+    "description": "Complete API collection for User Management System built with Node.js, Express & MongoDB",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api", "type": "string" },
+    { "key": "userId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Create User",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Alice Johnson\",\n  \"email\": \"alice@example.com\",\n  \"age\": 28,\n  \"hobbies\": [\"reading\", \"hiking\"],\n  \"bio\": \"Alice loves exploring mountains and reading books.\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Get All Users",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/users?page=1&limit=10&sortBy=createdAt&order=desc",
+          "host": ["{{baseUrl}}"], "path": ["users"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" },
+            { "key": "sortBy", "value": "createdAt" },
+            { "key": "order", "value": "desc" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Search Users by Name",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/users?name=Alice",
+          "host": ["{{baseUrl}}"], "path": ["users"],
+          "query": [{ "key": "name", "value": "Alice" }]
+        }
+      }
+    },
+    {
+      "name": "Filter by Email + Age",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/users?email=alice@example.com&age=28",
+          "host": ["{{baseUrl}}"], "path": ["users"],
+          "query": [
+            { "key": "email", "value": "alice@example.com" },
+            { "key": "age", "value": "28" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filter by Age Range",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/users?minAge=20&maxAge=35",
+          "host": ["{{baseUrl}}"], "path": ["users"],
+          "query": [
+            { "key": "minAge", "value": "20" },
+            { "key": "maxAge", "value": "35" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filter by Hobbies",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/users?hobbies=hiking",
+          "host": ["{{baseUrl}}"], "path": ["users"],
+          "query": [{ "key": "hobbies", "value": "hiking" }]
+        }
+      }
+    },
+    {
+      "name": "Text Search on Bio",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/users?search=mountain books",
+          "host": ["{{baseUrl}}"], "path": ["users"],
+          "query": [{ "key": "search", "value": "mountain books" }]
+        }
+      }
+    },
+    {
+      "name": "Get User by ID",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/users/{{userId}}",
+          "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}"]
+        }
+      }
+    },
+    {
+      "name": "Update User",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": {
+          "raw": "{{baseUrl}}/users/{{userId}}",
+          "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Alice Johnson Updated\",\n  \"age\": 29,\n  \"bio\": \"Updated bio for Alice.\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Delete User",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/users/{{userId}}",
+          "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}"]
+        }
+      }
+    }
+  ]
+}
